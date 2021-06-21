@@ -2,7 +2,7 @@ const express = require('express');
 const Show = require('../models/showModel')
 const Cinema = require('../models/cinemaModel');
 const Movie = require('../models/movieModel');
-const Review = require('../models/reviewModel')
+const Review = require('../models/reviewModel');
 
 const router = new express.Router();
 
@@ -19,6 +19,7 @@ router.get('/cinema-shows', async (req, res) => {
             else
                 moviesInCinema.set(show.show.movie._id, [show.show])
         });
+
         const arrayMap = Array.from(moviesInCinema)
         res.send(arrayMap)
     } catch (e) {
@@ -65,8 +66,9 @@ router.get('/get-cinema', async (req, res) => {
     try {
         const cinema = await Cinema.findOne({ title });
         if (!cinema)
-            throw new Error('No Cinema Data')
-        res.send(cinema)
+            throw new Error('No Cinema Data');
+        const populatedCinema = await cinema.populate('shows.show').execPopulate();
+        res.send(populatedCinema)
     } catch (e) {
         res.status(400).send({
             status: 400,
