@@ -4,6 +4,7 @@ const Cinema = require('../models/cinemaModel')
 const Movie = require('../models/movieModel')
 const Admin = require('../models/adminModel');
 const auth = require('../middlewares/auth');
+const Seat = require('../models/seatModel');
 
 const router = new express.Router();
 
@@ -58,13 +59,23 @@ router.post('/admin/add-cinema', auth, async (req, res) => {
 router.post('/admin/add-show', auth, async (req, res) => {
     try {
         const show = new Show(req.body.show);
-        const cinema = await Cinema.findById(req.body.show.cinema._id)
+        const cinema = await Cinema.findById(req.body.show.cinema._id);
+        console.log(req.body.show.cinema.numberOfSeats, cinema.numberOfSeats)
+        for (let i = 1; i <= req.body.show.cinema.numberOfSeats; i++) {
+            const seat = new Seat({
+                number: i,
+                price: 14,
+                isTaken: false
+            });
+            show.seats = show.seats.concat({ seat });
+            await seat.save();
+        }
         cinema.shows = cinema.shows.concat({ show });
         await cinema.save();
         await show.save();
         res.send(show)
     } catch (e) {
-        res.status(500).send(e);
+        res.status(500).send(e.message);
     }
 })
 

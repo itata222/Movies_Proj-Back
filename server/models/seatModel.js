@@ -6,6 +6,11 @@ const seatSchema = new mongoose.Schema({
         required: true,
         min: 0
     },
+    price: {
+        type: Number,
+        required: true,
+        min: 0
+    },
     isTaken: {
         type: Boolean,
         required: true

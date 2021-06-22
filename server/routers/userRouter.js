@@ -3,6 +3,7 @@ const Show = require('../models/showModel')
 const Cinema = require('../models/cinemaModel');
 const Movie = require('../models/movieModel');
 const Review = require('../models/reviewModel');
+const Seat = require('../models/seatModel');
 
 const router = new express.Router();
 
@@ -47,7 +48,7 @@ router.get('/movie-schedualedInACinema', async (req, res) => {
     }
 })
 
-router.post('/takeSeats', async (req, res) => {
+router.post('/take-seats', async (req, res) => {
     const seats = req.body.seats;
     const showID = req.body.showID
     try {
@@ -98,8 +99,11 @@ router.get('/get-show', async (req, res) => {
         const show = await Show.findById(id);
         if (!show)
             throw new Error('No Show Data')
-        const populatedShow = await show.populate('movie').execPopulate();
-        res.send(populatedShow)
+        const populatedShow1 = await show.populate('movie').execPopulate();
+        const populatedShow2 = await populatedShow1.populate('cinema').execPopulate();
+        const populatedShowFinal = await populatedShow2.populate('seats.seat').execPopulate();
+
+        res.send(populatedShowFinal)
     } catch (e) {
         res.status(400).send({
             status: 400,
