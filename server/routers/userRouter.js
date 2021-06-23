@@ -50,12 +50,16 @@ router.get('/movie-schedualedInACinema', async (req, res) => {
 
 router.post('/take-seats', async (req, res) => {
     const seats = req.body.seats;
-    const showID = req.body.showID
+    const showID = req.query.showID
     try {
         const show = await Show.findById(showID);
-        seats.forEach((seat) => {
+        seats.forEach(async (seat) => {
+            const seatObj = await Seat.findById(seat._id);
+            seatObj.isTaken = true;
+            await seatObj.save();
             show.seats[seat.number].isTaken = true;
         })
+        await show.save();
         res.send(show.seats)
     } catch (e) {
         res.status(500).send(e)

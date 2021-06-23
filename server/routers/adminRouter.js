@@ -60,7 +60,6 @@ router.post('/admin/add-show', auth, async (req, res) => {
     try {
         const show = new Show(req.body.show);
         const cinema = await Cinema.findById(req.body.show.cinema._id);
-        console.log(req.body.show.cinema.numberOfSeats, cinema.numberOfSeats)
         for (let i = 1; i <= req.body.show.cinema.numberOfSeats; i++) {
             const seat = new Seat({
                 number: i,
