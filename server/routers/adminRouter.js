@@ -5,17 +5,13 @@ const Movie = require('../models/movieModel')
 const Admin = require('../models/adminModel');
 const auth = require('../middlewares/auth');
 const Seat = require('../models/seatModel');
+const { createAdmin } = require('../services/repositories/adminRepo');
 
 const router = new express.Router();
 
 router.post('/create-admin', async (req, res) => {
-    try {
-        const admin = new Admin(req.body);
-        const token = await admin.generateAuthToken();
-        res.send({ admin, token });
-    } catch (e) {
-        res.status(500).send(e.message)
-    }
+    const { admin, token } = await createAdmin(req.body);
+    res.send({ admin, token })
 })
 
 router.post('/admin/login', async (req, res) => {
@@ -66,8 +62,8 @@ router.post('/admin/add-show', auth, async (req, res) => {
                 price: 14,
                 isTaken: false
             });
-            show.seats = show.seats.concat({ seat });
             await seat.save();
+            show.seats = show.seats.concat({ seat });
         }
         cinema.shows = cinema.shows.concat({ show });
         await cinema.save();

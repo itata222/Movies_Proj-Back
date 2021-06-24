@@ -52,6 +52,12 @@ router.post('/take-seats', async (req, res) => {
     const seats = req.body.seats;
     const showID = req.query.showID
     try {
+        if (!seats.length > 0) {
+            return res.status(400).send({
+                status: 400,
+                message: 'no seats selected'
+            })
+        }
         const show = await Show.findById(showID);
         seats.forEach(async (seat) => {
             const seatObj = await Seat.findById(seat._id);
